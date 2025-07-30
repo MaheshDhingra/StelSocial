@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Random Cat Fact</h2>
+    {% if cat_fact %}
+        <div class="cat-fact-card">
+            <p>{{ cat_fact }}</p>
+        </div>
+    {% else %}
+        <p>Could not fetch a cat fact. Please try again.</p>
+    {% endif %}
+{% endblock %}

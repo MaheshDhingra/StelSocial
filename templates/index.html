@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Recent Posts</h2>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post-card">
+                <img src="{{ post.image_url }}" alt="Post Image">
+                <p class="post-caption">{{ post.caption }}</p>
+                <p class="post-author">Posted by: <a href="{{ url_for('profile', username=post.author.username) }}">{{ post.author.username }}</a> on {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <div class="post-actions">
+                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-link">
+                            {% if current_user and current_user.id in post.likes|map(attribute='user_id')|list %}
+                                Unlike ({{ post.likes|length }})
+                            {% else %}
+                                Like ({{ post.likes|length }})
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+                <div class="comments-section">
+                    <h4>Comments:</h4>
+                    {% if post.comments %}
+                        {% for comment in post.comments %}
+<p><strong>{{ comment.user.username }}:</strong> {{ comment.text }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
+                    <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+                        <input type="text" name="comment_text" placeholder="Add a comment..." required>
+                        <button type="submit">Comment</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No posts yet. Be the first to create one!</p>
+    {% endif %}
+
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('index', page=pagination.prev_num) }}" class="btn btn-secondary">Previous</a>
+        {% endif %}
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for('index', page=page) }}" class="btn btn-secondary">{{ page }}</a>
+                {% else %}
+                    <span class="btn btn-primary current-page">{{ page }}</span>
+                {% endif %}
+            {% else %}
+                <span class="ellipsis">...</span>
+            {% endif %}
+        {% endfor %}
+        {% if pagination.has_next %}
+            <a href="{{ url_for('index', page=pagination.next_num) }}" class="btn btn-secondary">Next</a>
+        {% endif %}
+    </div>
+{% endblock %}

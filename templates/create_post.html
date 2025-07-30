@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Create New Post</h2>
+    <form method="POST" class="post-form">
+        <div class="form-group">
+            <label for="image_url">Image URL:</label>
+            <input type="url" id="image_url" name="image_url" required>
+        </div>
+        <div class="form-group">
+            <label for="caption">Caption (optional):</label>
+            <textarea id="caption" name="caption" rows="4"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Post</button>
+    </form>
+{% endblock %}

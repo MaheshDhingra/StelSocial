@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Search Results for "{{ query }}"</h2>
+
+    <h3>Users:</h3>
+    {% if users %}
+        <ul>
+            {% for user in users %}
+                <li><a href="{{ url_for('profile', username=user.username) }}">{{ user.username }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+
+    <h3>Posts:</h3>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post-card">
+                <img src="{{ post.image_url }}" alt="Post Image">
+                <p class="post-caption">{{ post.caption }}</p>
+                <p class="post-author">Posted by: <a href="{{ url_for('profile', username=post.author.username) }}">{{ post.author.username }}</a> on {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                <div class="post-actions">
+                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-link">
+                            {% if current_user and current_user.id in post.likes|map(attribute='user_id')|list %}
+                                Unlike ({{ post.likes|length }})
+                            {% else %}
+                                Like ({{ post.likes|length }})
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+                <div class="comments-section">
+                    <h4>Comments:</h4>
+                    {% if post.comments %}
+                        {% for comment in post.comments %}
+                            <p><strong>{{ comment.author.username }}:</strong> {{ comment.text }}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
+                    <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST">
+                        <input type="text" name="comment_text" placeholder="Add a comment..." required>
+                        <button type="submit">Comment</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No posts found.</p>
+    {% endif %}
+{% endblock %}

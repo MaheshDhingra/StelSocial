@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Your Conversations</h2>
+    {% if conversations %}
+        <div class="conversation-list">
+            {% for conv in conversations %}
+                <a href="{{ url_for('conversation', other_user_id=conv.other_user.id) }}" class="conversation-item">
+                    <div class="conversation-info">
+                        <strong>{{ conv.other_user.username }}</strong>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You don't have any conversations yet. Find users through search to start chatting!</p>
+    {% endif %}
+{% endblock %}

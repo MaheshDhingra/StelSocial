@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="profile-header">
+        <img src="{{ user.profile_picture }}" alt="Profile Picture" class="profile-picture">
+        <div class="profile-info">
+            <h2>{{ user.username }}</h2>
+            <p class="profile-bio">{% if user.bio %}{{ user.bio }}{% else %}No bio yet.{% endif %}</p>
+            <div class="profile-stats">
+                <span><strong>{{ user.posts|length }}</strong> posts</span>
+                <span><strong>{{ user.followers.count() }}</strong> followers</span>
+                <span><strong>{{ user.followed.count() }}</strong> following</span>
+            </div>
+            {% if session.user_id != user.id %}
+                <div class="profile-actions">
+                    {% if current_user.is_following(user) %}
+                        <form action="{{ url_for('unfollow_user', username=user.username) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-secondary">Unfollow</button>
+                        </form>
+                    {% else %}
+                        <form action="{{ url_for('follow_user', username=user.username) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-primary">Follow</button>
+                        </form>
+                    {% endif %}
+                    <a href="{{ url_for('conversation', other_user_id=user.id) }}" class="btn btn-secondary">Message</a>
+                </div>
+            {% else %}
+                <div class="profile-actions">
+                    <a href="{{ url_for('edit_profile') }}" class="btn btn-secondary">Edit Profile</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <h3>{{ user.username }}'s Posts</h3>
+    {% if user.posts %}
+        <div class="profile-posts">
+            {% for post in user.posts %}
+                <div class="post-card">
+                    <img src="{{ post.image_url }}" alt="Post Image">
+                    <p class="post-caption">{{ post.caption }}</p>
+                    <p class="post-date">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    {% if session.user_id == user.id %}
+                        <div class="post-actions">
+                            <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-secondary">Edit</a>
+                            <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>{{ user.username }} has no posts yet.</p>
+    {% endif %}
+{% endblock %}
